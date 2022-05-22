@@ -15,23 +15,27 @@ class FechasReservadas {
 
     }
 
-    public function showdata()
+    public function showdata($idarea)
     {
-        return self::getData("SELECT siexcepciones.idareareservada, siexcepciones.fechaexcepcion, siexcepciones.horaexepcion FROM siaxfechashorarios as ax INNER JOIN siexcepciones on siexcepciones.idareareservada = ax.idareacampus where siexcepciones.horaexepcion != 'all'");
+        return self::getData("SELECT siexcepciones.idareareservada, siexcepciones.fechaexcepcion, siexcepciones.horaexepcion FROM siaxfechashorarios as ax INNER JOIN siexcepciones on siexcepciones.idareareservada = ax.idareacampus where siexcepciones.horaexepcion != 'all' and siexcepciones.idareareservada = $idarea");
     }
 
     public function showdata2($value)
     {
-        return self::getData("SELECT s.fechaexcepcion as fechaexepcion FROM siexcepciones as s, sictareas as c where s.idareareservada = 1 and s.horaexepcion = 'all' and c.idareacampus = $value ");
+        return self::getData("SELECT s.fechaexcepcion as fechaexepcion FROM siexcepciones as s INNER JOIN sictareas as c ON c.idareacampus = s.idareareservada where s.idareareservada = $value and s.horaexepcion = 'all' ");
     }
 }
 
 if (isset($_GET['fecha'])){
     $obt = new FechasReservadas();
-    $data = $obt->showdata();
+    $data = $obt->showdata($_GET['idarea']);
 
-    foreach ($data as $row){
-        echo $row['horaexepcion'].",";
+    if(sizeof($data)>1){
+        foreach ($data as $row){
+            echo $row['horaexepcion'].",";
+        }
+    }else{
+        echo "vacio";
     }
 }else if (isset($_GET['whereFecha'])){
     $obt = new FechasReservadas();
