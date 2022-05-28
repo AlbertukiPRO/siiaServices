@@ -193,8 +193,8 @@ if (isset($_GET['id'])){
 
 
 
-//$pdf->Output('D', 'ComprobanteCita.pdf');
-    $pdf->Output('I','ComprobanteCita.pdf');
+$pdf->Output('D', 'ComprobanteCita.pdf');
+    //$pdf->Output('I','ComprobanteCita.pdf');
 
 }
 
