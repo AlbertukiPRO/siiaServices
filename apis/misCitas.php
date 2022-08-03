@@ -21,7 +21,7 @@ class MisCitas{
     }
 
     public function showdata2($idarea, $dia){
-        return self::getData("SELECT * FROM simscitas where idareacampus = $idarea and fechareservadacita = '$dia' ");
+        return self::getData("SELECT si.idareacampus as strIdCita, si.idhistorialacademico as strUser, si.descripcioncita as strDescripcionCita, s2.nombreArea as area,s.nombretramite as tramite, si.retroalimentacioncita as strRepuesta, CONCAT(' ',',',si.horaReservada) as strFechaHoraReservada FROM simscitas as si INNER JOIN sicttramites s on si.idtramite = s.idtramite INNER JOIN sictareas s2 on si.idareacampus = s2.idareacampus where si.idareacampus = $idarea and si.fechareservadacita = '$dia' and si.estatuscitas = 'Agendada' ");
     }
 }
 

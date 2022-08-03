@@ -15,9 +15,18 @@ class FechasReservadas {
 
     }
 
-    public function showdata($idarea)
+    public function showdata($idarea, $fecha)
     {
-        return self::getData("SELECT siexcepciones.idareareservada, siexcepciones.fechaexcepcion, siexcepciones.horaexepcion FROM siaxfechashorarios as ax INNER JOIN siexcepciones on siexcepciones.idareareservada = ax.idareacampus where siexcepciones.horaexepcion != 'all' and siexcepciones.idareareservada = $idarea");
+        /**
+         * @api para obtener los horarios no disponibles segun el dia
+         */
+        return self::getData("SELECT
+                                        siexcepciones.idareareservada,
+                                        siexcepciones.fechaexcepcion,
+                                        siexcepciones.horaexepcion
+                                    FROM siaxfechashorarios as ax
+                                        INNER JOIN siexcepciones on siexcepciones.idareareservada = ax.idareacampus
+                                    where siexcepciones.horaexepcion != 'all' and siexcepciones.idareareservada = $idarea and fechaexcepcion = '$fecha' ");
     }
 
     public function showdata2($value)
@@ -28,7 +37,7 @@ class FechasReservadas {
 
 if (isset($_GET['fecha'])){
     $obt = new FechasReservadas();
-    $data = $obt->showdata($_GET['idarea']);
+    $data = $obt->showdata($_GET['idarea'], $_GET['fecha']);
 
     if(sizeof($data)>1){
         foreach ($data as $row){
@@ -37,9 +46,9 @@ if (isset($_GET['fecha'])){
     }else{
         echo "vacio";
     }
-}else if (isset($_GET['whereFecha'])){
+}else if (isset($_GET['idarea'])){
     $obt = new FechasReservadas();
-    $data = $obt->showdata2($_GET['whereFecha']);
+    $data = $obt->showdata2($_GET['idarea']);
 
     foreach ($data as $row){
         echo $row['fechaexepcion'].",";
