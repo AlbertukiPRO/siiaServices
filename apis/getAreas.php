@@ -12,16 +12,12 @@ class Areas
         $enlace = $conector->conectar();
         $resultado = $enlace->prepare($consulta, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $resultado->execute();
-        $resultados = $resultado->fetchAll(PDO::FETCH_ASSOC);
-
-        return $resultados;
+        return $resultado->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function showdata()
     {
-        $data = self::getData("SELECT a.idareacampus as intIdAreas, a.nombreArea as strNombreAreas FROM sictareas as a");
-
-        return $data;
+        return self::getData("SELECT a.idareacampus as intIdAreas, a.nombreArea as strNombreAreas FROM sictareas as a");
     }
 }
 
