@@ -41,7 +41,7 @@ if (isset($_GET['typeService'])){
     switch ($_GET['typeService']){
         case '1':
             if (isset($_GET['idArea'])){
-                $sql = "SELECT ci.idcita as strIdCita, ci.descripcioncita as strDescripcionCita, ci.retroalimentacioncita as strRepuesta, ci.fechareservadacita as strFechaHoraReservada, ci.idhistorialacademico as strUser, s2.nombretramite as strtramite, s.facultad as strPrograma, ci.horaReservada as strHora
+                $sql = "SELECT ci.idcita as strIdCita, ci.descripcioncita as strDescripcionCita, ci.retroalimentacioncita as strRepuesta, ci.fechareservadacita as strFechaHoraReservada, ci.idhistorialacademico as strUser, s2.nombretramite as strtramite, s.facultad as strPrograma, ci.horaReservada as strHora, s.nombre as strNombre
                         FROM simscitas as ci
                             INNER JOIN simsalumnos s on ci.idhistorialacademico = s.idhistorialacademico
                             INNER JOIN sicttramites s2 on ci.idtramite = s2.idtramite
@@ -61,8 +61,8 @@ if (isset($_GET['typeService'])){
             break;
         case 3:
             if (isset($_GET['idArea']) && isset($_GET['idTramite'])){
-                $sql = "SELECT * FROM simscitas WHERE idtramite = :idTramite and idareacampus = :idarea";
-                $res = $obt->Execute(array(':idTramite'=>$_GET['idTramite'], ':idarea'=>$_GET['idArea']), $sql);
+                $sql = "SELECT * FROM simscitas WHERE idtramite = :idtramite and idareacampus = :idarea";
+                $res = $obt->Execute(array(':idtramite'=>$_GET['idTramite'], ':idarea'=>$_GET['idArea']), $sql);
                 ReportesServices::displayJSON($res);
             }else
                 ReportesServices::ServerError();
