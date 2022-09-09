@@ -4,22 +4,12 @@
 include ("../resources/Conexion.php");
 
 class SaveCita {
-    public static function Insertar($consulta, $lista){
+    public static function Insertar($consulta, $arraydata){
         $conector = new Conexion;
 
         $enlace = $conector->conectar();
         $resultado = $enlace->prepare($consulta, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-        $resultado->execute(array(':idh'=>$lista[0], ':idareacampus'=>$lista[1], ':idtramite'=>$lista[2],':descripCita'=>$lista[3],':fechaCita'=>$lista[4],':horaCita'=>$lista[5]));
-
-        return $resultado;
-    }
-
-    public static function InsertarFechasHorarios($consulta, $lista){
-        $conector = new Conexion;
-
-        $enlace = $conector->conectar();
-        $resultado = $enlace->prepare($consulta, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-        $resultado->execute(array(':idarea'=>$lista[0], ':fechareservada'=>$lista[1], ':horareservada'=>$lista[2], ':userid'=>$lista[3]));
+        $resultado->execute($arraydata);
 
         return $resultado;
     }
@@ -31,35 +21,64 @@ class SaveCita {
 
             $matricula = $data['matricula'];
 
+            /**
+             * @SQL para insertar la cita
+             */
             $consulta = "INSERT INTO simscitas (idhistorialacademico, idareacampus, idtramite, descripcioncita, estatuscitas, fechareservadacita, horaReservada, useraudit) VALUES (:idh,:idareacampus,:idtramite,:descripCita,'Agendada',:fechaCita,:horaCita,$matricula)" ;
+            $lista = array(':idh'=>$data['matricula'], ':idareacampus'=>$data['idarea'], ':idtramite'=>$data['idtramite'],':descripCita'=>$data['descripcion'],':fechaCita'=>$data['fecha'],':horaCita'=>$data['hora']);
 
-            $lista = array($data['matricula'],$data['idarea'],$data['idtramite'],$data['descripcion'],$data['fecha'],$data['hora']);
 
+            /**
+             * @SQL para insertar la fecha
+             */
             $sql = "INSERT INTO siexcepciones (idareareservada, fechaexcepcion,horaexepcion, useraudit) VALUES (:idarea,:fechareservada, :horareservada, :userid)";
-            $lista2 = array($data['idarea'],$data['fecha'],$data['hora'],$data['matricula']);
+
+            $lista2 = array(':idarea'=>$data['idarea'], ':fechareservada'=>$data['fecha'], ':horareservada'=>$data['hora'], ':userid'=>$data['matricula']);
 
             $res = self::Insertar($consulta,$lista);
-            $res2 = self::InsertarFechasHorarios($sql,$lista2);
+            $res2 = self::Insertar($sql,$lista2);
             if ($res and $res2){
                 return $res;
             }else{
                 return false;
             }
-        }catch (\Throwable $th){
+        }catch (Throwable $th){
             echo $th;
         }
     }
 
+    public function saveConfig(){
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        $idarea = $data['idarea'];
+
+
+        $sql = "update configuraciones set horaFin = :horafin, horaInicio = :horainicio, duracionCita = :duracioncita where idArea = :idarea";
+
+        $arraydata = array(':horainicio'=>$data['horainicion'], ':horafin'=>$data['horafin'],':duracioncita'=>$data['duracion'], ':idarea'=>$idarea);
+
+        return self::Insertar($sql, $arraydata);
+    }
 }
 
 $obt = new SaveCita();
-$res = $obt->showData();
-if ($res){
-    echo $res->rowCount();
+if (isset($_GET['savesetting'])){
+    $res = $obt->saveConfig();
+    if ($res)
+        echo $res->rowCount();
+    else
+        echo "No se pudo guardar las configuraciones de area";
 }else{
-    echo "No se guardo la cita: ";
-}
 
+    $res = $obt->showData();
+    if ($res){
+        echo $res->rowCount();
+    }else{
+        echo "No se guardo la cita: ";
+    }
+
+}
 //$json = file_get_contents('php://input');
 //$data = json_decode($json, true);
 //
