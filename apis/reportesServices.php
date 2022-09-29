@@ -8,7 +8,12 @@ class ReportesServices {
         $enlace = $conector->conectar();
         $resultado = $enlace->prepare($consulta, array(PDO::ATTR_CURSOR, PDO::CURSOR_FWDONLY));
         $resultado->execute($params);
-        return $resultado;
+
+        if ($resultado->rowCount()==0){
+            var_dump($resultado->errorInfo());
+            return $resultado;
+        }else
+            return $resultado;
     }
 
     static function displayJSON($res){
@@ -40,6 +45,20 @@ if (isset($_GET['typeService'])){
     $obt = new ReportesServices();
     switch ($_GET['typeService']){
         case '1':
+            if (isset($_GET['idArea']) && isset($_GET['idTramite'])){
+                $sql = "
+                SELECT ci.idtramite as strIdCita, ci.descripcioncita as strDescripcionCita, ci.retroalimentacioncita as strRepuesta, ci.fechareservadacita as strFechaHoraReservada, s2.matricula as strUser, s.nombretramite as strtramite, s2.nombre as strNombre, ci.horaReservada as strHora, s2.facultad as strPrograma
+                       FROM simscitas as ci
+                       INNER JOIN sicttramites s on ci.idtramite = s.idtramite
+                       INNER JOIN simsalumnos s2 on ci.idhistorialacademico = s2.idhistorialacademico
+                WHERE ci.idtramite = :idtramite and ci.idareacampus = :idarea
+                ";
+                $res = $obt->Execute(array(':idtramite'=>$_GET['idTramite'], ':idarea'=>$_GET['idArea']), $sql);
+                ReportesServices::displayJSON($res);
+            }else
+                ReportesServices::ServerError();
+            break;
+        case '2':
             if (isset($_GET['idArea'])){
                 $sql = "SELECT ci.idcita as strIdCita, ci.descripcioncita as strDescripcionCita, ci.retroalimentacioncita as strRepuesta, ci.fechareservadacita as strFechaHoraReservada, ci.idhistorialacademico as strUser, s2.nombretramite as strtramite, s.facultad as strPrograma, ci.horaReservada as strHora, s.nombre as strNombre
                         FROM simscitas as ci
@@ -51,18 +70,16 @@ if (isset($_GET['typeService'])){
             }else
                 ReportesServices::ServerError();
             break;
-        case '2':
+        case '3':
             if (isset($_GET['fecha']) && isset($_GET['idArea'])){
-                $sql = "SELECT * FROM simscitas WHERE fechareservadacita = :fecha and idareacampus = :idarea";
+                $sql = "
+                        SELECT ci.idtramite as strIdCita, ci.descripcioncita as strDescripcionCita, ci.retroalimentacioncita as strRepuesta, ci.fechareservadacita as strFechaHoraReservada, s2.matricula as strUser, s.nombretramite as strtramite, s2.nombre as strNombre, ci.horaReservada as strHora, s2.facultad as strPrograma
+                               FROM simscitas as ci
+                               INNER JOIN sicttramites s on ci.idtramite = s.idtramite
+                               INNER JOIN simsalumnos s2 on ci.idhistorialacademico = s2.idhistorialacademico
+                               WHERE ci.fechareservadacita = :fecha and ci.idareacampus = :idarea
+                        ";
                 $res = $obt->Execute(array(':fecha'=>$_GET['fecha'], ':idarea'=>$_GET['idArea']), $sql);
-                ReportesServices::displayJSON($res);
-            }else
-                ReportesServices::ServerError();
-            break;
-        case 3:
-            if (isset($_GET['idArea']) && isset($_GET['idTramite'])){
-                $sql = "SELECT * FROM simscitas WHERE idtramite = :idtramite and idareacampus = :idarea";
-                $res = $obt->Execute(array(':idtramite'=>$_GET['idTramite'], ':idarea'=>$_GET['idArea']), $sql);
                 ReportesServices::displayJSON($res);
             }else
                 ReportesServices::ServerError();

@@ -17,11 +17,18 @@ class MisCitas{
 
     public function showdata($idAlumno)
     {
-        return self::getData("SELECT ci.idcita as strIdCita, ci.idhistorialacademico as strUser,ci.descripcioncita as strDescripcionCita, s.nombreArea as area, s2.nombretramite as tramite,  ci.retroalimentacioncita as strRepuesta ,CONCAT(ci.fechareservadacita,',', ci.horaReservada) as strFechaHoraReservada, ci.estatuscitas as strEstatus FROM simscitas as ci INNER JOIN sictareas s ON ci.idareacampus = s.idareacampus INNER JOIN sicttramites s2 on ci.idtramite = s2.idtramite WHERE ci.idhistorialacademico = $idAlumno;");
+        return self::getData("SELECT ci.idcita as strIdCita, ci.idhistorialacademico as strUser,ci.descripcioncita as strDescripcionCita, s.nombreArea as area, s2.nombretramite as strtramite,  ci.retroalimentacioncita as strRepuesta ,CONCAT(ci.fechareservadacita,',', ci.horaReservada) as strFechaHoraReservada, ci.estatuscitas as strEstatus FROM simscitas as ci INNER JOIN sictareas s ON ci.idareacampus = s.idareacampus INNER JOIN sicttramites s2 on ci.idtramite = s2.idtramite WHERE ci.idhistorialacademico = $idAlumno;");
     }
 
     public function showdata2($idarea, $dia){
-        return self::getData("SELECT si.idareacampus as strIdCita, si.idhistorialacademico as strUser, si.descripcioncita as strDescripcionCita, s2.nombreArea as area,s.nombretramite as tramite, si.retroalimentacioncita as strRepuesta, CONCAT(' ',',',si.horaReservada) as strFechaHoraReservada FROM simscitas as si INNER JOIN sicttramites s on si.idtramite = s.idtramite INNER JOIN sictareas s2 on si.idareacampus = s2.idareacampus where si.idareacampus = $idarea and si.fechareservadacita = '$dia' and si.estatuscitas = 'Agendada' ");
+        return self::getData("
+            SELECT si.idareacampus as strIdCita, si.idhistorialacademico as strUser, si.descripcioncita as strDescripcionCita, s.nombretramite as strtramite, am.nombre as strNombre, si.retroalimentacioncita as strRepuesta, CONCAT(' ','',si.horaReservada) as strFechaHoraReservada
+            FROM simscitas as si
+                INNER JOIN sicttramites s on si.idtramite = s.idtramite
+                INNER JOIN sictareas s2 on si.idareacampus = s2.idareacampus
+                INNER JOIN simsalumnos am on si.idhistorialacademico = am.idhistorialacademico
+            WHERE si.idareacampus = $idarea and si.fechareservadacita = '$dia' and si.estatuscitas = 'Agendada'
+        ");
     }
 }
 

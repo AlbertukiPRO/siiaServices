@@ -21,12 +21,12 @@ class FechasReservadas {
          * @api para obtener los horarios no disponibles segun el dia
          */
         return self::getData("SELECT
-                                        siexcepciones.idareareservada,
-                                        siexcepciones.fechaexcepcion,
-                                        siexcepciones.horaexepcion
-                                    FROM siaxfechashorarios as ax
-                                        INNER JOIN siexcepciones on siexcepciones.idareareservada = ax.idareacampus
-                                    where siexcepciones.horaexepcion != 'all' and siexcepciones.idareareservada = $idarea and fechaexcepcion = '$fecha' ");
+                                        idareareservada,
+                                        fechaexcepcion,
+                                        horaexepcion
+                                    FROM siexcepciones
+                                    where idareareservada = $idarea and horaexepcion != 'all' and siexcepciones.fechaexcepcion LIKE '%$fecha%'
+                                    group by horaexepcion");
     }
 
     public function showdata2($value)

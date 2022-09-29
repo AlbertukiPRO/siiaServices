@@ -60,6 +60,32 @@ class SaveCita {
 
         return self::Insertar($sql, $arraydata);
     }
+
+    public function saveDaysDisable(){
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        $sql = "INSERT INTO siexcepciones (idareareservada, fechaexcepcion, horaexepcion, useraudit)
+                VALUES (:idarea, :fecha, :hora, :useraudit)";
+        $last = false;
+        foreach ($data['lista'] as $item){
+            $arraydata = array(':idarea'=>$data['idarea'], ':fecha'=>$data['fecha'], ':hora'=>$item, ':useraudit'=>$data['user']);
+            $last = self::Insertar($sql , $arraydata);
+        }
+        return $last;
+    }
+
+    public function reservarHorario(){
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        $sql = "INSERT INTO siexcepciones (idareareservada, fechaexcepcion, horaexepcion, useraudit)
+                VALUES (:idarea, :fecha, :hora, :user)";
+
+        $arraydata = array(':idarea'=>$data['idarea'], ':fecha'=>$data['fecha'], ':hora'=>$data['hora'], ':user'=>$data['user']);
+
+        return self::Insertar($sql, $arraydata);
+    }
 }
 
 $obt = new SaveCita();
@@ -69,8 +95,14 @@ if (isset($_GET['savesetting'])){
         echo $res->rowCount();
     else
         echo "No se pudo guardar las configuraciones de area";
-}else{
-
+}else if(isset($_GET['savedays'])){
+    $res = $obt->saveDaysDisable();
+    if ($res) echo "1";
+    else echo "No se pudo guardaron los datos";
+}else if (isset($_GET['reservar'])) {
+    $res = $obt->reservarHorario();
+    echo $res->rowCount();
+} else {
     $res = $obt->showData();
     if ($res){
         echo $res->rowCount();
